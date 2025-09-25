@@ -2,7 +2,7 @@
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
  * Todos os direitos reservados.
  *
- * VERSÃO 3.1 - Versão Final Estável
+ * VERSÃO 3.2 - Versão Final Estável
 */
 
 // --- CONFIGURAÇÃO ---
@@ -48,7 +48,6 @@ function setupEventListeners() {
     document.getElementById('user-form').addEventListener('submit', handleUserForm);
     document.getElementById('user-photo').addEventListener('change', openCropModal);
     document.querySelector('.photo-preview').addEventListener('click', () => document.getElementById('user-photo').click());
-    document.getElementById('result-photo-container').addEventListener('click', () => document.getElementById('result-user-photo-input').click());
     document.getElementById('confirm-crop-btn').addEventListener('click', applyCrop);
     document.getElementById('cancel-crop-btn').addEventListener('click', cancelCrop);
     document.getElementById('redo-btn').addEventListener('click', () => { playSound(clickSound); showScreen('identification'); updateProgress(10); });
