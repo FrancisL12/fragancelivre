@@ -6,10 +6,27 @@
 /* Reset e Base */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #ffffff; min-height: 100vh; overflow-x: hidden; }
-.container { max-width: 800px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
-.screen { display: none; animation: fadeIn 0.5s ease-in-out; }
-.screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* CORREÇÃO DE ALINHAMENTO: As telas agora controlam o alinhamento */
+.screen {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.screen.active {
+    display: flex; /* Alterado de 'block' para 'flex' */
+}
+.container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    /* Propriedades de alinhamento movidas para a classe .screen */
+}
 
 /* Welcome Screen & Logo */
 .logo { text-align: center; }
@@ -59,14 +76,8 @@ body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #00
 .loading-animation { text-align: center; }
 .perfume-bottle { font-size: 4rem; margin-bottom: 2rem; animation: bounce 1s infinite; }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-.loading-text h2 { font-family: 'Playfair Display', serif; color: #FFD700; margin-bottom: 1rem; }
-.dots span { animation: dots 1.4s infinite; animation-fill-mode: both; font-size: 2rem; color: #FFD700; }
-.dots span:nth-child(2) { animation-delay: 0.2s; }
-.dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes dots { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
 
 /* Results Screen */
-.result-content { text-align: center; }
 .user-info { margin-bottom: 1rem; }
 .user-photo-circle { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #FFD700; margin: 0 auto 1rem; overflow: hidden; }
 .user-photo-circle img { width: 100%; height: 100%; object-fit: cover; }
@@ -92,7 +103,7 @@ body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #00
 .credits-footer { color: #FFD700; font-family: 'Playfair Display', serif; text-align: center; margin-top: 1.5rem; opacity: 0.8; }
 
 /* Modal e Animações */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
 .modal-content { background: #1a1a1a; padding: 2rem; border-radius: 12px; border: 1px solid #333; text-align: center; max-width: 90vw; max-height: 90vh; }
 .modal-content h2 { font-family: 'Playfair Display', serif; color: #FFD700; margin-bottom: 1.5rem; }
 .crop-container { max-width: 400px; height: 400px; margin-bottom: 1.5rem; }
