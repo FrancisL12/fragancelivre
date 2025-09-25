@@ -2,7 +2,7 @@
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
  * Todos os direitos reservados.
  *
- * VERSÃO 2.6 - Correção de Lógica e Robustez Final
+ * VERSÃO 2.7 - Correção Final de Estabilidade e Estilo
 */
 
 // --- CONFIGURAÇÃO ---
@@ -89,17 +89,14 @@ function runFragranceMatchEngine() {
         const finalRecommendations = scoredCandidates.filter(p => p.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
         currentState.result = finalRecommendations;
 
-        // **LÓGICA DE ARQUÉTIPO CORRIGIDA E SEGURA**
         if (finalRecommendations.length > 0) {
             const topPerfume = finalRecommendations[0];
             const primaryAccord = topPerfume['acorde principal 1'];
             const archetypeKey = accordToArchetypeMap[primaryAccord] || 'default';
             currentState.archetype = archetypes[archetypeKey];
         } else {
-            // Define um arquétipo padrão se não houver recomendações
             currentState.archetype = archetypes['default'];
         }
-
         showResults();
     } catch (error) { console.error("ERRO NO MOTOR:", error); alert("Ocorreu um erro ao processar suas preferências."); showScreen('welcome'); }
 }
@@ -159,7 +156,7 @@ function setupActionButtons() {
     whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-// --- Funções restantes (quiz, crop, share) sem alterações ---
+// --- Funções restantes (quiz, crop, share) ---
 function handleUserForm(event) { event.preventDefault(); const formData = new FormData(event.target); currentState.userProfile.name = formData.get('user-name'); currentState.userPreferences.preferencia_genero = formData.get('universe'); currentState.userPreferences.preferencia_origem = formData.get('origin'); playSound(successSound); startQuiz(); }
 function startQuiz() { showScreen('quiz'); currentState.currentQuestion = 0; displayQuestion(); }
 function displayQuestion() { const question = questions[currentState.currentQuestion]; const progress = 10 + ((currentState.currentQuestion + 1) / questions.length) * 80; updateProgress(progress); document.getElementById('question-title').textContent = question.title; const optionsContainer = document.getElementById('question-options'); optionsContainer.innerHTML = ''; const optionsList = document.createElement('div'); optionsList.className = 'options-list-simple'; question.options.forEach(option => { const button = document.createElement('button'); button.className = 'option-button-simple'; button.textContent = option.text; button.addEventListener('click', () => selectAnswer(question.id, option.value)); optionsList.appendChild(button); }); optionsContainer.appendChild(optionsList); }
