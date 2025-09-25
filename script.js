@@ -6,9 +6,9 @@
 */
 
 // --- CONFIGURAÇÃO ---
-const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxmIvPrUPOtn5xALHbFKSHjjtvT0Bm37y5GADmbNqBLVbhctylofHnCaPU1W27NBmI/exec';
-const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbzxZDfrUJK0VxetiUaSQqXTlRKQu_TMjyb5N5-G78_ueCG1VYH4qhEOqwnJ9OJVdDXB/exec';
-const GOOGLE_SHEET_URL_LEADS = 'COLE_A_URL_DO_SEU_NOVO_APP_DA_WEB_AQUI'; // <-- IMPORTANTE: Cole a URL do script que salva os leads
+const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxmIvPrUPOtn5xALHbFKSHjjtvT0Bm37y5GADmbNqBLVbhctylofHnCaPU1W27NBmI/exec'; // <-- IMPORTANTE: Cole a URL do script que recomenda os perfumes -> cadastro
+const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbzxZDfrUJK0VxetiUaSQqXTlRKQu_TMjyb5N5-G78_ueCG1VYH4qhEOqwnJ9OJVdDXB/exec'; // <-- IMPORTANTE: Cole a URL do script que mapeia os perfumes
+const GOOGLE_SHEET_URL_LEADS = 'https://script.google.com/macros/s/AKfycby2aeEZRjojVfDOmlfED-3YOYZmLvEazmQwaauEJjhmNOKbYwRX3zVe__KfhiTu_Jlc/exec'; // <-- IMPORTANTE: Cole a URL do script que salva os leads
 const WHATSAPP_NUMBER = '5511999999999'; // <-- IMPORTANTE: Troque pelo número do seu cliente aqui (formato DDI+DDD+NUMERO)
 
 // --- ARQUÉTIPOS ---
