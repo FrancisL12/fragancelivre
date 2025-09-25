@@ -2,12 +2,13 @@
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
  * Todos os direitos reservados.
  *
- * VERSÃO 3.2 - Versão Final Estável
+ * VERSÃO 4.0 - Captura de Leads Integrada
 */
 
 // --- CONFIGURAÇÃO ---
 const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxmIvPrUPOtn5xALHbFKSHjjtvT0Bm37y5GADmbNqBLVbhctylofHnCaPU1W27NBmI/exec';
 const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbzxZDfrUJK0VxetiUaSQqXTlRKQu_TMjyb5N5-G78_ueCG1VYH4qhEOqwnJ9OJVdDXB/exec';
+const GOOGLE_SHEET_URL_LEADS = 'COLE_A_URL_DO_SEU_NOVO_APP_DA_WEB_AQUI'; // <-- IMPORTANTE: Cole a URL do script que salva os leads
 const WHATSAPP_NUMBER = '5511999999999'; // <-- IMPORTANTE: Troque pelo número do seu cliente aqui (formato DDI+DDD+NUMERO)
 
 // --- ARQUÉTIPOS ---
@@ -51,6 +52,10 @@ function setupEventListeners() {
     document.getElementById('confirm-crop-btn').addEventListener('click', applyCrop);
     document.getElementById('cancel-crop-btn').addEventListener('click', cancelCrop);
     document.getElementById('redo-btn').addEventListener('click', () => { playSound(clickSound); showScreen('identification'); updateProgress(10); });
+    // NOVO: Adiciona o listener para o formulário de telefone
+    if(document.getElementById('phone-form')) {
+        document.getElementById('phone-form').addEventListener('submit', submitLeadAndShowResults);
+    }
 }
 function playSound(sound) { try { sound.currentTime = 0; sound.play().catch(e => {}); } catch (e) {} }
 function showScreen(screenName) {
@@ -95,7 +100,7 @@ function runFragranceMatchEngine() {
             }
         }
         currentState.archetype = archetypes[foundArchetypeKey];
-        showResults();
+        // MODIFICADO: Não chama mais o showResults() aqui.
     } catch (error) { console.error("ERRO NO MOTOR:", error); alert("Ocorreu um erro ao processar suas preferências."); showScreen('welcome'); }
 }
 
@@ -104,7 +109,7 @@ function showResults() {
     showScreen('results');
     const { name, photo } = currentState.userProfile;
     const { archetype } = currentState;
-    document.getElementById('result-user-photo').src = photo || "data:image/svg+xml,...";
+    document.getElementById('result-user-photo').src = photo || "data:image/svg+xml,..."; // Placeholder
     document.getElementById('result-user-name').textContent = name || 'Viajante Olfativo';
     if (archetype) {
         document.getElementById('archetype-name').textContent = archetype.name;
@@ -140,12 +145,64 @@ function setupActionButtons() {
     whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-// --- Funções restantes (quiz, crop) ---
+// --- Funções de QUIZ, CROP e NOVO FLUXO DE SUBMISSÃO ---
 function handleUserForm(event) { event.preventDefault(); const formData = new FormData(event.target); currentState.userProfile.name = formData.get('user-name'); currentState.userPreferences.preferencia_genero = formData.get('universe'); currentState.userPreferences.preferencia_origem = formData.get('origin'); playSound(successSound); startQuiz(); }
 function startQuiz() { showScreen('quiz'); currentState.currentQuestion = 0; displayQuestion(); }
 function displayQuestion() { const question = questions[currentState.currentQuestion]; const progress = 10 + ((currentState.currentQuestion + 1) / questions.length) * 80; updateProgress(progress); document.getElementById('question-title').textContent = question.title; const optionsContainer = document.getElementById('question-options'); optionsContainer.innerHTML = ''; const optionsList = document.createElement('div'); optionsList.className = 'options-list-simple'; question.options.forEach(option => { const button = document.createElement('button'); button.className = 'option-button-simple'; button.textContent = option.text; button.addEventListener('click', () => selectAnswer(question.id, option.value)); optionsList.appendChild(button); }); optionsContainer.appendChild(optionsList); }
 function selectAnswer(questionId, value) { playSound(clickSound); currentState.userPreferences[questionId] = value; setTimeout(() => { if (currentState.currentQuestion < questions.length - 1) { currentState.currentQuestion++; displayQuestion(); } else { showLoadingScreen(); } }, 400); }
-function showLoadingScreen() { showScreen('loading'); setTimeout(() => { runFragranceMatchEngine(); }, 3000); }
+
+// MODIFICADO: Agora essa função apenas mostra a tela de loading e roda o motor
+function showLoadingScreen() {
+    showScreen('loading');
+    // Roda o motor para calcular os resultados em segundo plano
+    runFragranceMatchEngine();
+}
+
+// NOVO: Função para enviar os dados para a planilha e depois mostrar os resultados
+async function submitLeadAndShowResults(event) {
+    event.preventDefault();
+    const phoneInput = document.getElementById('user-phone');
+    const userPhone = phoneInput.value;
+    const button = event.target.querySelector('button[type="submit"]');
+
+    button.textContent = 'Enviando...';
+    button.disabled = true;
+
+    const leadData = {
+        nome: currentState.userProfile.name,
+        telefone: userPhone,
+        universo: currentState.userPreferences.preferencia_genero,
+        origem: currentState.userPreferences.preferencia_origem,
+        familiaOlfativa: currentState.userPreferences.familia_olfativa,
+        estacao: currentState.userPreferences.estacao,
+        horario: currentState.userPreferences.horario,
+        recomendacoes: currentState.result
+    };
+
+    try {
+        await fetch(GOOGLE_SHEET_URL_LEADS, {
+            method: 'POST',
+            mode: 'no-cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(leadData)
+        });
+    } catch (error) {
+        console.error("Erro ao enviar o lead:", error);
+    } finally {
+        // Atraso para dar um feedback visual antes de mudar de tela
+        setTimeout(() => {
+            playSound(successSound);
+            showResults();
+            button.textContent = 'Ver meu resultado!';
+            button.disabled = false;
+        }, 500);
+    }
+}
+
+// Funções de CROP (sem alteração)
 function openCropModal(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { imageToCrop.src = e.target.result; modal.style.display = 'flex'; if (cropper) cropper.destroy(); cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1, background: false, autoCropArea: 0.8 }); }; reader.readAsDataURL(file); }
 function applyCrop() { if (!cropper) return; const canvas = cropper.getCroppedCanvas({ width: 256, height: 256 }); currentState.userProfile.photo = canvas.toDataURL('image/jpeg'); document.getElementById('preview-img').src = currentState.userProfile.photo; document.getElementById('preview-img').style.display = 'block'; document.querySelector('.photo-placeholder').style.display = 'none'; document.getElementById('result-user-photo').src = currentState.userProfile.photo; cancelCrop(); }
 function cancelCrop() { if (cropper) { cropper.destroy(); cropper = null; } modal.style.display = 'none'; }
