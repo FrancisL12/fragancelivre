@@ -6,11 +6,31 @@
 /* Reset e Base */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #ffffff; min-height: 100vh; overflow-x: hidden; }
-.container { max-width: 800px; margin: 0 auto; padding: 20px; width: 100%; display: flex; flex-direction: column; justify-content: center; min-height: 100vh; }
 
-/* CORREÇÃO DO SISTEMA DE TELAS */
-.screen { display: none; animation: fadeIn 0.5s ease-in-out; }
-.screen.active { display: block; }
+/* CORREÇÃO DO SISTEMA DE TELAS E ALINHAMENTO */
+.screen {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+    min-height: 100vh;
+    width: 100%;
+    display: flex; /* Garante que o conteúdo dentro da tela possa ser centralizado com flexbox */
+    align-items: center; /* Centraliza verticalmente o conteúdo da tela */
+    justify-content: center; /* Centraliza horizontalmente o conteúdo da tela */
+    padding: 20px;
+}
+.screen.active {
+    display: flex;
+}
+.container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex; /* Permite que o conteúdo do container seja um flex item */
+    flex-direction: column; /* Coloca os itens um abaixo do outro */
+    align-items: center; /* Centraliza horizontalmente os itens dentro do container */
+    text-align: center; /* Alinha o texto ao centro */
+}
+
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
