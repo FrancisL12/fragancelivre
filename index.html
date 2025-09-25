@@ -47,34 +47,23 @@
         <div id="quiz-screen" class="screen"><div class="container"><div class="progress-bar"><div class="progress"></div></div><div class="quiz-content"><h2 id="question-title"></h2><div id="question-options"></div></div></div></div>
 
         <div id="loading-screen" class="screen">
-    <div class="container">
-        <div class="loading-animation">
-            <div class="perfume-bottle">🧴</div>
-            <div class="loading-text">
-                <h2>Analisando suas preferências...</h2>
-                <div class="dots"><span>.</span><span>.</span><span>.</span></div>
+            <div class="container">
+                <div class="perfume-bottle">🧴</div>
+                <h2>Sua análise está quase pronta!</h2>
+                <p style="color: #cccccc; margin-bottom: 1.5rem; max-width: 450px;">
+                    Às vezes, a recomendação perfeita não carrega na tela. <br>
+                    Deixe seu WhatsApp e te enviamos o resultado por lá para garantir!
+                </p>
+                <form id="phone-form" style="width: 100%; max-width: 400px;">
+                    <div class="form-group" style="text-align: left; margin-bottom: 1.5rem;">
+                        <label for="user-phone" style="text-align: center; display: block; margin-bottom: 0.5rem;">Seu WhatsApp com DDD:</label>
+                        <input type="tel" id="user-phone" name="user-phone" required placeholder="(11) 99999-9999" 
+                               style="text-align: center; font-size: 1.2rem; padding: 14px; background: #1a1a1a; color: #ffffff; border: 2px solid #333; border-radius: 8px; width: 100%;">
+                    </div>
+                    <button type="submit" class="btn-primary">Ver meu resultado!</button>
+                </form>
             </div>
         </div>
-    </div>
-</div>
-<div id="loading-screen" class="screen">
-    <div class="container">
-        <div class="perfume-bottle">🧴</div>
-        <h2>Sua análise está quase pronta!</h2>
-        <p style="color: #cccccc; margin-bottom: 1.5rem;">
-            Às vezes, a recomendação perfeita não carrega na tela. <br>
-            Deixe seu WhatsApp e te enviamos o resultado por lá para garantir!
-        </p>
-        <form id="phone-form" style="width: 100%; max-width: 400px;">
-            <div class="form-group" style="text-align: center;">
-                <label for="user-phone">Seu WhatsApp com DDD:</label>
-                <input type="tel" id="user-phone" name="user-phone" required placeholder="(11) 99999-9999" 
-                       style="text-align: center; font-size: 1.2rem; padding: 14px; background: #1a1a1a; color: #ffffff; border: 2px solid #333; border-radius: 8px; width: 100%;">
-            </div>
-            <button type="submit" class="btn-primary">Ver meu resultado!</button>
-        </form>
-    </div>
-</div>
 
         <div id="results-screen" class="screen">
             <div class="container">
