@@ -3,12 +3,12 @@
  * Todos os direitos reservados. A reprodução, distribuição ou transmissão
  * não autorizada deste código e seus dados associados é estritamente proibida.
  *
- * VERSÃO 2.3 - Manipulação Inteligente de Dados da API
+ * VERSÃO 2.4 - Lógica de Pontuação Corrigida e Modo de Depuração
 */
 
 // --- CONFIGURAÇÃO DAS FONTES DE DADOS (GOOGLE SHEETS) ---
-const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxOidKtrbNnv7wwU-WoKBoAb5SjaQlfTJNsU-Hf7MUKLQ4ZyCifJxwYx1ugnSnGUas/exec';
-const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbxoDgNX_GvHcsDdW9nliFOpebUchewp1hm9fGvn0cFbxivpyuLyFM6jKn9FVO-rLfs/exec';
+const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxmIvPrUPOtn5xALHbFKSHjjtvT0Bm37y5GADmbNqBLVbhctylofHnCaPU1W27NBmI/exec';
+const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbzxZDfrUJK0VxetiUaSQqXTlRKQu_TMjyb5N5-G78_ueCG1VYH4qhEOqwnJ9OJVdDXB/exec';
 
 // --- NOVAS PERGUNTAS PARA O FRAGRANCE MATCH ENGINE ---
 const questions = [
@@ -40,20 +40,15 @@ async function initializeApp() {
             fetchGoogleSheet(GOOGLE_SHEET_URL_PERFUMES),
             fetchGoogleSheet(GOOGLE_SHEET_URL_MAPPING)
         ]);
-
-        // **CORREÇÃO PRINCIPAL**: Extrai o array de dentro do objeto, se necessário.
         const perfumes = Array.isArray(perfumesResponse) ? perfumesResponse : perfumesResponse[Object.keys(perfumesResponse)[0]];
         const mapping = Array.isArray(mappingResponse) ? mappingResponse : mappingResponse[Object.keys(mappingResponse)[0]];
-
-        if (!Array.isArray(perfumes) || !Array.isArray(mapping)) {
-            throw new Error("Os dados recebidos da planilha não estão no formato de lista (array) esperado.");
-        }
-
+        if (!Array.isArray(perfumes) || !Array.isArray(mapping)) { throw new Error("Os dados da planilha não estão no formato de lista esperado."); }
+        
         perfumeDatabase = perfumes.map(row => normalizeKeys(row));
         olfactoryMapping = processMappingData(mapping.map(row => normalizeKeys(row)));
     } catch (error) {
         console.error("ERRO FATAL NA INICIALIZAÇÃO:", error);
-        alert(`Não foi possível carregar os dados. Detalhes: ${error.message}. Verifique o console (F12) e as permissões da planilha.`);
+        alert(`Não foi possível carregar os dados. Detalhes: ${error.message}.`);
     }
 }
 
@@ -63,8 +58,24 @@ function showScreen(screenName) { Object.values(screens).forEach(screen => scree
 function updateProgress(percentage) { const activeScreen = document.querySelector('.screen.active'); if (!activeScreen) return; const progressBar = activeScreen.querySelector('.progress'); if (progressBar) progressBar.style.width = percentage + '%'; }
 function normalizeKeys(obj) { const newObj = {}; for (const key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { newObj[key.toLowerCase()] = obj[key]; } } return newObj; }
 
-async function fetchGoogleSheet(url) { try { const response = await fetch(url); if (!response.ok) { throw new Error(`Erro de HTTP ${response.status}: ${response.statusText}.`); } const text = await response.text(); try { return JSON.parse(text); } catch (e) { console.error("A resposta da planilha não é um JSON válido.", text); throw new Error("Formato de resposta inválido."); } } catch (error) { console.error(`Falha ao buscar dados de: ${url}`, error); if (error.message.includes('Failed to fetch')) { throw new Error('Erro de rede ou CORS.'); } throw error; } }
-function processMappingData(mappingData) { const mapping = {}; mappingData.forEach(row => { for (const group in row) { const normalizedGroup = group.toUpperCase().replace(/\s+/g, '_'); if (row[group]) { if (!mapping[normalizedGroup]) { mapping[normalizedGroup] = []; } mapping[normalizedGroup].push(row[group]); } } }); return mapping; }
+async function fetchGoogleSheet(url) { try { const response = await fetch(url); if (!response.ok) { throw new Error(`Erro de HTTP ${response.status}: ${response.statusText}.`); } const text = await response.text(); try { return JSON.parse(text); } catch (e) { throw new Error("Formato de resposta inválido."); } } catch (error) { if (error.message.includes('Failed to fetch')) { throw new Error('Erro de rede ou CORS.'); } throw error; } }
+
+// **LÓGICA CORRIGIDA**
+function processMappingData(mappingData) {
+    const mapping = {};
+    mappingData.forEach(row => {
+        for (const group in row) {
+            // A chave do 'mapping' agora é o nome do grupo em minúsculas, como "grupo: cítricas"
+            if (row[group]) {
+                if (!mapping[group]) {
+                    mapping[group] = [];
+                }
+                mapping[group].push(row[group]);
+            }
+        }
+    });
+    return mapping;
+}
 
 function openCropModal(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { imageToCrop.src = e.target.result; modal.style.display = 'flex'; if (cropper) cropper.destroy(); cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1, background: false, autoCropArea: 0.8 }); }; reader.readAsDataURL(file); }
 function applyCrop() { if (!cropper) return; const canvas = cropper.getCroppedCanvas({ width: 256, height: 256 }); currentState.userProfile.photo = canvas.toDataURL('image/jpeg'); document.getElementById('preview-img').src = currentState.userProfile.photo; document.getElementById('preview-img').style.display = 'block'; document.querySelector('.photo-placeholder').style.display = 'none'; document.getElementById('result-user-photo').src = currentState.userProfile.photo; cancelCrop(); }
@@ -76,7 +87,78 @@ function displayQuestion() { const question = questions[currentState.currentQues
 function selectAnswer(questionId, value) { playSound(clickSound); currentState.userPreferences[questionId] = value; setTimeout(() => { if (currentState.currentQuestion < questions.length - 1) { currentState.currentQuestion++; displayQuestion(); } else { showLoadingScreen(); } }, 400); }
 function showLoadingScreen() { showScreen('loading'); setTimeout(() => { runFragranceMatchEngine(); }, 3000); }
 
-function runFragranceMatchEngine() { try { const prefs = currentState.userPreferences; let candidates = perfumeDatabase.filter(perfume => { const generoPerfume = (perfume['gênero'] || '').toLowerCase(); const generoUsuario = (prefs.preferencia_genero || '').toLowerCase(); let generoMatch = generoUsuario === 'versatil' || generoPerfume === generoUsuario || generoPerfume === 'unissex'; const origemPerfume = (perfume['origem perfume'] || '').toLowerCase(); const origemUsuario = (prefs.preferencia_origem || '').toLowerCase(); let origemMatch = origemUsuario === 'ambos' || origemPerfume === origemUsuario; return generoMatch && origemMatch; }); const userAccordList = (prefs.familia_olfativa || []).flatMap(familyGroup => olfactoryMapping[familyGroup] || []); const uniqueUserAcords = [...new Set(userAccordList)]; const scoredCandidates = candidates.map(perfume => { let score = 0; const perfumeAcords = [perfume['acorde principal 1'], perfume['acorde principal 2'], perfume['acorde principal 3']].filter(Boolean); perfumeAcords.forEach(accord => { if (uniqueUserAcords.includes(accord)) score += 3; }); const estacaoPerfume = (perfume['estação'] || '').toLowerCase(); if (prefs.estacao === 'todas' || (prefs.estacao || '').includes(estacaoPerfume)) score += 2; const horarioPerfume = (perfume['horário de uso'] || '').toLowerCase(); if (prefs.horario === 'ambos' || horarioPerfume === prefs.horario) score += 2; return { ...perfume, score }; }); const finalRecommendations = scoredCandidates.sort((a, b) => b.score - a.score).slice(0, 5); currentState.result = finalRecommendations; showResults(); } catch (error) { console.error("ERRO NO MOTOR DE RECOMENDAÇÃO:", error); alert("Ocorreu um erro ao processar suas preferências. Por favor, tente novamente."); showScreen('welcome'); } }
+// --- MOTOR DE RECOMENDAÇÃO (COM CORREÇÕES E MODO DETETIVE) ---
+function runFragranceMatchEngine() {
+    console.clear(); // Limpa o console para uma nova análise
+    console.log("--- INICIANDO MOTOR DE RECOMENDAÇÃO ---");
+    try {
+        const prefs = currentState.userPreferences;
+        console.log("Preferências do Usuário:", prefs);
+
+        let candidates = perfumeDatabase.filter(perfume => {
+            const generoPerfume = (perfume['gênero'] || '').toLowerCase();
+            const generoUsuario = (prefs.preferencia_genero || '').toLowerCase();
+            let generoMatch = generoUsuario === 'versatil' || generoPerfume === generoUsuario || generoPerfume === 'unissex';
+            
+            const origemPerfume = (perfume['origem perfume'] || '').toLowerCase();
+            const origemUsuario = (prefs.preferencia_origem || '').toLowerCase();
+            let origemMatch = origemUsuario === 'ambos' || origemPerfume === origemUsuario;
+            
+            return generoMatch && origemMatch;
+        });
+
+        // **LÓGICA CORRIGIDA**: Converte a preferência do usuário para minúsculas para corresponder às chaves do mapping.
+        const userAccordList = (prefs.familia_olfativa || [])
+            .flatMap(familyGroup => olfactoryMapping[familyGroup.toLowerCase()] || []);
+        const uniqueUserAcords = [...new Set(userAccordList)];
+        console.log("Acordes preferidos pelo usuário:", uniqueUserAcords);
+
+        const scoredCandidates = candidates.map(perfume => {
+            let score = 0;
+            let debugReason = [];
+
+            const perfumeAcords = [perfume['acorde principal 1'], perfume['acorde principal 2'], perfume['acorde principal 3']].filter(Boolean);
+            perfumeAcords.forEach(accord => {
+                if (uniqueUserAcords.includes(accord)) {
+                    score += 3;
+                    debugReason.push(`+3 (acorde '${accord}')`);
+                }
+            });
+
+            const estacaoPerfume = (perfume['estação'] || '').toLowerCase();
+            if (prefs.estacao === 'todas' || (prefs.estacao || '').includes(estacaoPerfume)) {
+                score += 2;
+                debugReason.push(`+2 (estação '${estacaoPerfume}')`);
+            }
+            
+            const horarioPerfume = (perfume['horário de uso'] || '').toLowerCase();
+            if (prefs.horario === 'ambos' || horarioPerfume === prefs.horario) {
+                score += 2;
+                debugReason.push(`+2 (horário '${horarioPerfume}')`);
+            }
+
+            // **MODO DETETIVE**: Imprime a análise de cada perfume no console (F12)
+            console.log(`[Analisando] ${perfume['nome do perfume']} | Pontuação: ${score} | Motivo: ${debugReason.join(', ')}`);
+
+            return { ...perfume, score };
+        });
+
+        // Filtra para manter apenas perfumes com pontuação maior que 0
+        const finalRecommendations = scoredCandidates
+            .filter(p => p.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 5);
+
+        console.log("--- RECOMENDAÇÕES FINAIS ---", finalRecommendations);
+        currentState.result = finalRecommendations;
+        showResults();
+
+    } catch (error) {
+        console.error("ERRO NO MOTOR DE RECOMENDAÇÃO:", error);
+        alert("Ocorreu um erro ao processar suas preferências.");
+        showScreen('welcome');
+    }
+}
 
 function showResults() { showScreen('results'); const userProfile = currentState.userProfile; const photoElement = document.getElementById('result-user-photo'); photoElement.src = userProfile.photo || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 24 24' fill='none' stroke='%23ffd700' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.52 19c.64-2.2 1.84-3 3.22-3h6.52c1.38 0 2.58.8 3.22 3'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E"; document.getElementById('result-user-name').textContent = (userProfile.name || 'Viajante Olfativo').toUpperCase(); displayPerfumeRecommendations(); }
 function displayPerfumeRecommendations() { const recommendations = currentState.result; const container = document.getElementById('recommended-perfumes'); container.innerHTML = ''; if (!recommendations || recommendations.length === 0) { container.innerHTML = '<p class="no-results-message">Nenhum perfume encontrado com estes critérios. Tente uma combinação diferente!</p>'; return; } recommendations.forEach(perfume => { const cardLink = document.createElement('a'); cardLink.href = perfume['link do botão de compra'] || '#'; cardLink.target = '_blank'; cardLink.className = 'perfume-card-link'; cardLink.innerHTML = `<div class="perfume-card"><div class="perfume-image-container"><img src="${perfume['link da foto de exibição'] || 'https://i.postimg.cc/50nm5WfF/foto-lord-aroma.png'}" alt="Foto do perfume ${perfume['nome do perfume']}" class="perfume-image"></div><div class="perfume-info"><h4>${perfume['nome do perfume']}</h4><div class="brand">${perfume['marca']}</div><div class="notes"><strong>Acordes:</strong> ${[perfume['acorde principal 1'], perfume['acorde principal 2'], perfume['acorde principal 3']].filter(Boolean).join(', ')}</div></div></div>`; container.appendChild(cardLink); }); }
