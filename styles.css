@@ -1,9 +1,6 @@
 /*
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
- * Todos os direitos reservados. A reprodução, distribuição ou transmissão
- * não autorizada deste código e seus dados associados é estritamente proibida.
- *
- * VERSÃO 2.0 - White Label com Fragrance Match Engine
+ * Todos os direitos reservados.
 */
 
 /* Reset e Base */
@@ -25,102 +22,61 @@ body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #00
 .welcome-content p { font-size: 0.8rem; color: #cccccc; margin-bottom: 1.8rem; line-height: 1.6; max-width: 300px; margin-left: auto; margin-right: auto; }
 
 /* Buttons */
-.btn-primary, .btn-secondary, .btn-whatsapp { padding: 15px 30px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+.btn-primary, .btn-secondary, .btn-whatsapp { padding: 15px 30px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; width: 100%; max-width: 400px; }
 .btn-primary { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000000; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3); }
 #start-btn { padding: 17px 100px; font-size: 1.2rem; }
 .btn-secondary { background: transparent; border: 2px solid #FFD700 !important; color: #FFD700; }
 .btn-secondary:hover { background: #FFD700; color: #000000; }
-.btn-whatsapp { background: linear-gradient(45deg, #25D366, #128C7E); color: white; font-size: 1.2rem; margin-top: 1rem; }
-.btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3); }
+.btn-whatsapp { background: linear-gradient(45deg, #25D366, #128C7E); color: white; }
 .pulse { animation: pulse 2s infinite; }
 @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
 /* Progress Bar & Forms */
 .progress-bar { width: 100%; height: 6px; background: #333333; border-radius: 3px; margin-bottom: 2rem; overflow: hidden; }
 .progress { height: 100%; background: linear-gradient(45deg, #FFD700, #FFA500); border-radius: 3px; transition: width 0.5s ease; }
-.form-group { margin-bottom: 2rem; }
-.form-group label { display: block; margin-bottom: 0.5rem; color: #FFD700; font-weight: 500; }
-.form-group input[type="text"] { width: 100%; padding: 12px 16px; border: 2px solid #333333; border-radius: 8px; background: #1a1a1a; color: #ffffff; font-size: 1rem; transition: border-color 0.3s ease; }
-.form-group input[type="text"]:focus { outline: none; border-color: #FFD700; }
+.form-group { margin-bottom: 1.5rem; }
 .photo-upload { display: flex; align-items: center; gap: 1rem; }
-.photo-upload input[type="file"] { display: none; }
 .photo-preview { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #FFD700; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; background: #1a1a1a; }
-.photo-placeholder { font-size: 2rem; color: #666666; }
 .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
 .radio-group { display: flex; flex-direction: column; gap: 1rem; }
 .radio-option { display: flex; align-items: center; padding: 12px 16px; border: 2px solid #333333; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
 .radio-option:hover { border-color: #FFD700; }
-.radio-option input[type="radio"] { margin-right: 12px; accent-color: #FFD700; }
-.radio-option span { font-weight: 500; }
 
 /* Quiz Styles */
 .quiz-content h2 { font-family: 'Playfair Display', serif; font-size: 2rem; text-align: center; margin-bottom: 2rem; color: #FFD700; }
 .options-list-simple { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 500px; margin: 2rem auto 0; }
 .option-button-simple { background-color: transparent; border: 2px solid #FFD700; color: #FFD700; padding: 16px 20px; font-size: 1rem; font-weight: 500; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 100%; }
-.option-button-simple:hover { background-color: #FFD700; color: #000000; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2); }
+.option-button-simple:hover { background-color: #FFD700; color: #000000; }
 
 /* Loading Screen */
 .loading-animation { text-align: center; }
 .perfume-bottle { font-size: 4rem; margin-bottom: 2rem; animation: bounce 1s infinite; }
-@keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
-.loading-text h2 { font-family: 'Playfair Display', serif; color: #FFD700; margin-bottom: 1rem; }
-.dots span { animation: dots 1.4s infinite; animation-fill-mode: both; font-size: 2rem; color: #FFD700; }
-.dots span:nth-child(2) { animation-delay: 0.2s; }
-.dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes dots { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
 /* Results Screen */
 .result-content { text-align: center; }
-.user-info { margin-bottom: 2rem; }
+.user-info { margin-bottom: 1rem; }
 .user-photo-circle { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #FFD700; margin: 0 auto 1rem; overflow: hidden; }
 .user-photo-circle img { width: 100%; height: 100%; object-fit: cover; }
 .user-name { font-family: 'Playfair Display', serif; font-size: 2.5rem; text-transform: uppercase; color: #FFD700; margin-bottom: 0.5rem; }
-.perfume-recommendations { margin-bottom: 2rem; }
+/* Estilos para o Arquétipo */
+.archetype-name { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #FFD700; margin-bottom: 0.5rem; }
+.archetype-description { font-size: 1rem; line-height: 1.6; color: #cccccc; max-width: 450px; margin: 0 auto 2rem auto; }
 .perfume-recommendations h3 { color: #FFD700; margin-bottom: 1.5rem; font-size: 1.4rem; font-family: 'Playfair Display', serif; }
 .perfumes-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-.perfume-card-link { text-decoration: none; color: inherit; display: block; }
-.perfume-card { display: flex; align-items: center; gap: 1rem; background: #1a1a1a; border: 1px solid #333333; border-radius: 12px; padding: 1rem; text-align: left; transition: all 0.3s ease; }
-.perfume-card:hover { border-color: #FFD700; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.1); }
-.perfume-image-container { flex-shrink: 0; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; }
+.perfume-card { display: grid; grid-template-columns: 80px 1fr auto; align-items: center; gap: 1rem; background: #1a1a1a; border: 1px solid #333333; border-radius: 12px; padding: 1rem; text-align: left; }
+.perfume-image-container { width: 80px; height: 80px; border-radius: 8px; overflow: hidden; }
 .perfume-image { width: 100%; height: 100%; object-fit: cover; }
-.perfume-info { flex-grow: 1; }
-.perfume-card h4 { color: #FFD700; margin-bottom: 0.25rem; font-size: 1.1rem; }
-.perfume-card .brand { color: #cccccc; font-size: 0.9rem; margin-bottom: 0.5rem; }
-.perfume-card .notes { color: #999999; font-size: 0.85rem; line-height: 1.4; }
-.no-results-message { color: #FFD700; background-color: #1a1a1a; border: 1px solid #333; padding: 1.5rem; border-radius: 12px; text-align: center; }
+.perfume-info h4 { color: #FFD700; font-size: 1.1rem; }
+.perfume-info .brand { color: #cccccc; font-size: 0.9rem; margin-bottom: 0.5rem; }
+.perfume-info .notes { color: #999999; font-size: 0.85rem; }
+/* Estilo para o botão "Compre Agora" */
+.buy-button { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000000; padding: 10px 15px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: transform 0.2s ease; display: inline-block; }
+.buy-button:hover { transform: scale(1.05); }
+.no-results-message { color: #FFD700; background-color: #1a1a1a; border: 1px solid #333; padding: 1.5rem; border-radius: 12px; }
 
 /* Action Buttons & Footer */
-.action-buttons { margin-top: 1rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.action-buttons { margin-top: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%; }
 .cta-section { width: 100%; max-width: 600px; padding: 2rem; background: #1a1a1a; border-radius: 12px; border: 1px solid #333333; text-align: center; }
-.cta-section::before { content: '🚨🚨🚨'; display: block; font-size: 1.5rem; margin-bottom: 1rem; }
 .cta-text { color: #cccccc; margin-bottom: 1rem; font-size: 1.1rem; }
-.credits-footer { color: #FFD700; font-family: 'Playfair Display', serif; font-size: 1.1rem; text-align: center; margin-top: 1.5rem; margin-bottom: 1rem; opacity: 0.8; }
-
-/* Modal e Animações */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background: #1a1a1a; padding: 2rem; border-radius: 12px; border: 1px solid #333; text-align: center; max-width: 90vw; max-height: 90vh; }
-.modal-content h2 { font-family: 'Playfair Display', serif; color: #FFD700; margin-bottom: 1.5rem; }
-.crop-container { max-width: 400px; height: 400px; margin-bottom: 1.5rem; }
-.modal-buttons { display: flex; justify-content: center; gap: 1rem; }
-.cropper-view-box, .cropper-face { border-radius: 50%; }
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #1a1a1a; }
-::-webkit-scrollbar-thumb { background: #FFD700; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #FFA500; }
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container { padding: 15px; }
-    .logo h1 { font-size: 2.5rem; }
-    .welcome-content h2 { font-size: 2rem; }
-    .user-name { font-size: 2rem; }
-}
-@media (max-width: 480px) {
-    .logo h1 { font-size: 3rem; }
-    .welcome-content h2 { font-size: 1.5rem; }
-    .btn-primary, .btn-secondary, .btn-whatsapp { padding: 12px 24px; font-size: 1rem; }
-    .user-name { font-size: 1.5rem; }
-    .perfume-card { flex-direction: column; text-align: center; }
-    .perfume-info { margin-top: 1rem; }
-}
+.credits-footer { color: #FFD700; font-family: 'Playfair Display', serif; text-align: center; margin-top: 1.5rem; opacity: 0.8; }
