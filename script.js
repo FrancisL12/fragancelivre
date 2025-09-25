@@ -2,7 +2,7 @@
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
  * Todos os direitos reservados.
  *
- * VERSÃO 2.7 - Correção Final de Estabilidade e Estilo
+ * VERSÃO 2.8 - Final
 */
 
 // --- CONFIGURAÇÃO ---
@@ -21,10 +21,7 @@ const archetypes = {
     'oriental': { name: 'A Presença Exótica', description: 'Sedutor, opulento e inesquecível. Seus perfumes são ricos e complexos, ideais para quem tem uma personalidade forte e não tem medo de deixar sua marca.' },
     'default': { name: 'O Explorador Olfativo', description: 'Sua personalidade é versátil e aberta a novas descobertas. Esta seleção foi criada para se adaptar aos seus mais variados momentos e humores.' }
 };
-const accordToArchetypeMap = {
-    'Amadeirado': 'amadeirado', 'Cítrico': 'cítrico', 'Floral': 'floral', 'Frutado': 'frutado', 'Especiado': 'especiado',
-    'Aromático': 'aromático', 'Oriental': 'oriental', 'Fougère': 'aromático', 'Chipre': 'amadeirado', 'Gourmand': 'oriental'
-};
+const accordToArchetypeMap = { 'Amadeirado': 'amadeirado', 'Cítrico': 'cítrico', 'Floral': 'floral', 'Frutado': 'frutado', 'Especiado': 'especiado', 'Aromático': 'aromático', 'Oriental': 'oriental', 'Fougère': 'aromático', 'Chipre': 'amadeirado', 'Gourmand': 'oriental' };
 
 // --- VARIÁVEIS DE ESTADO E ELEMENTOS DO DOM ---
 const questions = [ { id: 'familia_olfativa', title: "Qual destes universos de cheiros mais te atrai?", options: [ { text: "Cítricos & Frescos", value: ["GRUPO: CÍTRICAS", "GRUPO: FRUTAS"] }, { text: "Doces & Gourmands", value: ["GRUPO: DOCES & AROMAS GOURMETS", "GRUPO: BEBIDAS"] }, { text: "Florais & Delicados", value: ["GRUPO: FLORES BRANCAS", "GRUPO: FLORES NATURAIS E RECONSTRUÍDAS"] }, { text: "Amadeirados & Marcantes", value: ["GRUPO: MADEIRAS & MUSGOS", "GRUPO: RESINAS & BÁLSAMOS"] }, { text: "Exóticos & Especiados", value: ["GRUPO: ESPECIARIAS", "GRUPO: MUSK, ÂMBARES, NOTAS ANIMÁLICAS"] }, { text: "Verdes & Naturais", value: ["GRUPO: PLANTAS, ERVAS E FOUGÈRES", "GRUPO: VEGETAIS"] } ] }, { id: 'estacao', title: "Você busca um perfume para qual estação?", options: [ { text: "Calor Intenso (Verão)", value: "verao" }, { text: "Frio Aconchegante (Inverno)", value: "inverno" }, { text: "Clima Amenos (Outono/Primavera)", value: "outono,primavera" }, { text: "Todas as Estações", value: "todas" } ] }, { id: 'horario', title: "E para qual momento do dia?", options: [ { text: "Para o Dia", value: "dia" }, { text: "Para a Noite", value: "noite" }, { text: "Versátil (Dia e Noite)", value: "ambos" } ] } ];
@@ -35,7 +32,6 @@ const modal = document.getElementById('crop-modal'), imageToCrop = document.getE
 
 // --- INICIALIZAÇÃO E FUNÇÕES GLOBAIS ---
 document.addEventListener('DOMContentLoaded', initializeApp);
-
 async function initializeApp() {
     setupEventListeners();
     try {
@@ -47,7 +43,6 @@ async function initializeApp() {
         olfactoryMapping = processMappingData(mapping.map(row => normalizeKeys(row)));
     } catch (error) { console.error("ERRO FATAL NA INICIALIZAÇÃO:", error); alert(`Não foi possível carregar os dados. Detalhes: ${error.message}.`); }
 }
-
 function setupEventListeners() {
     document.getElementById('start-btn').addEventListener('click', () => { playSound(clickSound); showScreen('identification'); updateProgress(10); });
     document.getElementById('user-form').addEventListener('submit', handleUserForm);
@@ -56,10 +51,8 @@ function setupEventListeners() {
     document.getElementById('result-photo-container').addEventListener('click', () => document.getElementById('result-user-photo-input').click());
     document.getElementById('confirm-crop-btn').addEventListener('click', applyCrop);
     document.getElementById('cancel-crop-btn').addEventListener('click', cancelCrop);
-    document.getElementById('share-btn').addEventListener('click', shareResult);
     document.getElementById('redo-btn').addEventListener('click', () => { playSound(clickSound); showScreen('identification'); updateProgress(10); });
 }
-
 function playSound(sound) { try { sound.currentTime = 0; sound.play().catch(e => {}); } catch (e) {} }
 function showScreen(screenName) { Object.values(screens).forEach(screen => screen.classList.remove('active')); screens[screenName].classList.add('active'); currentState.screen = screenName; }
 function updateProgress(percentage) { const activeScreen = document.querySelector('.screen.active'); if (!activeScreen) return; const progressBar = activeScreen.querySelector('.progress'); if (progressBar) progressBar.style.width = `${percentage}%`; }
@@ -74,7 +67,6 @@ function runFragranceMatchEngine() {
         let candidates = perfumeDatabase.filter(p => (prefs.preferencia_genero === 'versatil' || (p['gênero']||'').toLowerCase() === prefs.preferencia_genero || (p['gênero']||'').toLowerCase() === 'unissex') && (prefs.preferencia_origem === 'ambos' || (p['origem perfume']||'').toLowerCase() === prefs.preferencia_origem));
         const userAccordList = (prefs.familia_olfativa || []).flatMap(group => olfactoryMapping[group.toLowerCase()] || []);
         const uniqueUserAcords = [...new Set(userAccordList)];
-
         const scoredCandidates = candidates.map(perfume => {
             let score = 0;
             const perfumeAcords = [perfume['acorde principal 1'], perfume['acorde principal 2'], perfume['acorde principal 3']].filter(Boolean);
@@ -85,10 +77,8 @@ function runFragranceMatchEngine() {
             if (prefs.horario === 'ambos' || horarioPerfume === prefs.horario) score += 2;
             return { ...perfume, score };
         });
-
         const finalRecommendations = scoredCandidates.filter(p => p.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
         currentState.result = finalRecommendations;
-
         if (finalRecommendations.length > 0) {
             const topPerfume = finalRecommendations[0];
             const primaryAccord = topPerfume['acorde principal 1'];
@@ -106,19 +96,15 @@ function showResults() {
     showScreen('results');
     const { name, photo } = currentState.userProfile;
     const { archetype } = currentState;
-
     document.getElementById('result-user-photo').src = photo || "data:image/svg+xml,..."; // Use seu SVG padrão aqui
     document.getElementById('result-user-name').textContent = name || 'Viajante Olfativo';
-    
     if (archetype) {
         document.getElementById('archetype-name').textContent = archetype.name;
         document.getElementById('archetype-description').textContent = archetype.description;
     }
-
     displayPerfumeRecommendations();
     setupActionButtons();
 }
-
 function displayPerfumeRecommendations() {
     const container = document.getElementById('recommended-perfumes');
     container.innerHTML = '';
@@ -129,20 +115,10 @@ function displayPerfumeRecommendations() {
     currentState.result.forEach(perfume => {
         const card = document.createElement('div');
         card.className = 'perfume-card';
-        card.innerHTML = `
-            <div class="perfume-image-container">
-                <img src="${perfume['link da foto de exibição'] || 'https://i.postimg.cc/50nm5WfF/foto-lord-aroma.png'}" alt="Foto do perfume ${perfume['nome do perfume']}" class="perfume-image">
-            </div>
-            <div class="perfume-info">
-                <h4>${perfume['nome do perfume']}</h4>
-                <div class="brand">${perfume['marca']}</div>
-                <div class="notes">Acordes: ${[perfume['acorde principal 1'], perfume['acorde principal 2'], perfume['acorde principal 3']].filter(Boolean).join(', ')}</div>
-            </div>
-            <a href="${perfume['link do botão de compra'] || '#'}" target="_blank" class="buy-button">Compre Agora</a>`;
+        card.innerHTML = `<div class="perfume-image-container"><img src="${perfume['link da foto de exibição'] || 'https://i.postimg.cc/50nm5WfF/foto-lord-aroma.png'}" alt="Foto do perfume ${perfume['nome do perfume']}" class="perfume-image"></div><div class="perfume-info"><h4>${perfume['nome do perfume']}</h4><div class="brand">${perfume['marca']}</div><div class="notes">Acordes: ${[perfume['acorde principal 1'], perfume['acorde principal 2'], perfume['acorde principal 3']].filter(Boolean).join(', ')}</div></div><a href="${perfume['link do botão de compra'] || '#'}" target="_blank" class="buy-button">Compre Agora</a>`;
         container.appendChild(card);
     });
 }
-
 function setupActionButtons() {
     const whatsappBtn = document.getElementById('whatsapp-btn');
     const recommendations = currentState.result;
@@ -156,7 +132,7 @@ function setupActionButtons() {
     whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-// --- Funções restantes (quiz, crop, share) ---
+// --- Funções restantes (quiz, crop) ---
 function handleUserForm(event) { event.preventDefault(); const formData = new FormData(event.target); currentState.userProfile.name = formData.get('user-name'); currentState.userPreferences.preferencia_genero = formData.get('universe'); currentState.userPreferences.preferencia_origem = formData.get('origin'); playSound(successSound); startQuiz(); }
 function startQuiz() { showScreen('quiz'); currentState.currentQuestion = 0; displayQuestion(); }
 function displayQuestion() { const question = questions[currentState.currentQuestion]; const progress = 10 + ((currentState.currentQuestion + 1) / questions.length) * 80; updateProgress(progress); document.getElementById('question-title').textContent = question.title; const optionsContainer = document.getElementById('question-options'); optionsContainer.innerHTML = ''; const optionsList = document.createElement('div'); optionsList.className = 'options-list-simple'; question.options.forEach(option => { const button = document.createElement('button'); button.className = 'option-button-simple'; button.textContent = option.text; button.addEventListener('click', () => selectAnswer(question.id, option.value)); optionsList.appendChild(button); }); optionsContainer.appendChild(optionsList); }
@@ -165,4 +141,3 @@ function showLoadingScreen() { showScreen('loading'); setTimeout(() => { runFrag
 function openCropModal(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { imageToCrop.src = e.target.result; modal.style.display = 'flex'; if (cropper) cropper.destroy(); cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1, background: false, autoCropArea: 0.8 }); }; reader.readAsDataURL(file); }
 function applyCrop() { if (!cropper) return; const canvas = cropper.getCroppedCanvas({ width: 256, height: 256 }); currentState.userProfile.photo = canvas.toDataURL('image/jpeg'); document.getElementById('preview-img').src = currentState.userProfile.photo; document.getElementById('preview-img').style.display = 'block'; document.querySelector('.photo-placeholder').style.display = 'none'; document.getElementById('result-user-photo').src = currentState.userProfile.photo; cancelCrop(); }
 function cancelCrop() { if (cropper) { cropper.destroy(); cropper = null; } modal.style.display = 'none'; }
-function shareResult() { const resultContent = document.getElementById('result-content'); html2canvas(resultContent, { backgroundColor: '#1a1a1a', scale: 2, useCORS: true, scrollY: -window.scrollY }).then(canvas => { const link = document.createElement('a'); link.download = `meu-perfil-olfativo-${(currentState.userProfile.name || 'perfil').toLowerCase().replace(/\s+/g, '-')}.png`; link.href = canvas.toDataURL('image/png'); link.click(); playSound(successSound); const button = document.getElementById('share-btn'); const originalText = button.textContent; button.textContent = '✅ Imagem salva!'; button.style.background = '#25D366'; setTimeout(() => { button.textContent = originalText; button.style.background = ''; }, 3000); }).catch(error => { console.error('Erro ao gerar imagem:', error); alert('Erro ao gerar imagem.'); }); }
