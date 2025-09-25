@@ -4,43 +4,12 @@
 */
 
 /* Reset e Base */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-    color: #ffffff;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.screen {
-    display: none;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.screen.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #ffffff; min-height: 100vh; overflow-x: hidden; }
+.container { max-width: 800px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+.screen { display: none; animation: fadeIn 0.5s ease-in-out; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Welcome Screen & Logo */
 .logo { text-align: center; }
@@ -48,7 +17,6 @@ body {
 .logo h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; background: linear-gradient(45deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 0.5rem; }
 .logo .subtitle { text-align: center; color: #cccccc; font-size: 1.3rem; margin-bottom: 1rem; }
 .golden-divider { border: none; height: 2px; width: 244px; margin: 0.1rem auto 1.5rem; background: linear-gradient(90deg, transparent, #FFD700, transparent); opacity: 0.8; }
-.welcome-content { text-align: center; }
 .welcome-content h2 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 1rem; color: #FFD700; }
 .welcome-content p { font-size: 0.8rem; color: #cccccc; margin-bottom: 1.8rem; line-height: 1.6; max-width: 300px; margin-left: auto; margin-right: auto; }
 
@@ -122,3 +90,11 @@ body {
 .cta-section { width: 100%; max-width: 600px; padding: 2rem; background: #1a1a1a; border-radius: 12px; border: 1px solid #333333; text-align: center; }
 .cta-text { color: #cccccc; margin-bottom: 1rem; font-size: 1.1rem; }
 .credits-footer { color: #FFD700; font-family: 'Playfair Display', serif; text-align: center; margin-top: 1.5rem; opacity: 0.8; }
+
+/* Modal e Animações */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: #1a1a1a; padding: 2rem; border-radius: 12px; border: 1px solid #333; text-align: center; max-width: 90vw; max-height: 90vh; }
+.modal-content h2 { font-family: 'Playfair Display', serif; color: #FFD700; margin-bottom: 1.5rem; }
+.crop-container { max-width: 400px; height: 400px; margin-bottom: 1.5rem; }
+.modal-buttons { display: flex; justify-content: center; gap: 1rem; }
+.cropper-view-box, .cropper-face { border-radius: 50%; }
