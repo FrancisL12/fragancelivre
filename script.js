@@ -2,7 +2,7 @@
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
  * Todos os direitos reservados.
  *
- * VERSÃO 2.9 - Correção Final de Lógica e Estilo
+ * VERSÃO 3.0 - Versão Estável
 */
 
 // --- CONFIGURAÇÃO ---
@@ -54,7 +54,14 @@ function setupEventListeners() {
     document.getElementById('redo-btn').addEventListener('click', () => { playSound(clickSound); showScreen('identification'); updateProgress(10); });
 }
 function playSound(sound) { try { sound.currentTime = 0; sound.play().catch(e => {}); } catch (e) {} }
-function showScreen(screenName) { Object.values(screens).forEach(screen => screen.style.display = 'none'); screens[screenName].style.display = 'flex'; currentState.screen = screenName; }
+// **FUNÇÃO CORRIGIDA** para usar classes, não estilos inline.
+function showScreen(screenName) {
+    for (const key in screens) {
+        screens[key].classList.remove('active');
+    }
+    screens[screenName].classList.add('active');
+    currentState.screen = screenName;
+}
 function updateProgress(percentage) { const activeScreen = document.querySelector('.screen.active'); if (!activeScreen) return; const progressBar = activeScreen.querySelector('.progress'); if (progressBar) progressBar.style.width = `${percentage}%`; }
 function normalizeKeys(obj) { const newObj = {}; for (const key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { newObj[key.toLowerCase()] = obj[key]; } } return newObj; }
 async function fetchGoogleSheet(url) { try { const response = await fetch(url); if (!response.ok) throw new Error(`HTTP ${response.status}`); const text = await response.text(); try { return JSON.parse(text); } catch (e) { throw new Error("Resposta inválida da planilha."); } } catch (error) { throw new Error(`Erro de rede ou CORS: ${error.message}`); } }
@@ -79,18 +86,16 @@ function runFragranceMatchEngine() {
         });
         const finalRecommendations = scoredCandidates.filter(p => p.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
         currentState.result = finalRecommendations;
-
-        // --- LÓGICA DO ARQUÉTIPO CORRIGIDA ---
-        let foundArchetypeKey = 'default'; // Começa com o padrão
+        
+        // **LÓGICA DO ARQUÉTIPO CORRIGIDA**
+        let foundArchetypeKey = 'default';
         if (finalRecommendations.length > 0) {
             const topPerfume = finalRecommendations[0];
             const topPerfumeAccords = [topPerfume['acorde principal 1'], topPerfume['acorde principal 2'], topPerfume['acorde principal 3']].filter(Boolean);
-            
-            // Procura o primeiro acorde que corresponda a um arquétipo
             for (const accord of topPerfumeAccords) {
                 if (accordToArchetypeMap[accord]) {
                     foundArchetypeKey = accordToArchetypeMap[accord];
-                    break; // Para no primeiro que encontrar
+                    break; 
                 }
             }
         }
