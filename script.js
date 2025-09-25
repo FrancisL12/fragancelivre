@@ -2,7 +2,7 @@
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
  * Todos os direitos reservados.
  *
- * VERSÃO 3.0 - Versão Estável
+ * VERSÃO 3.1 - Versão Final Estável
 */
 
 // --- CONFIGURAÇÃO ---
