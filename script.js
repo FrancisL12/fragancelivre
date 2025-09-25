@@ -54,11 +54,8 @@ function setupEventListeners() {
     document.getElementById('redo-btn').addEventListener('click', () => { playSound(clickSound); showScreen('identification'); updateProgress(10); });
 }
 function playSound(sound) { try { sound.currentTime = 0; sound.play().catch(e => {}); } catch (e) {} }
-// **FUNÇÃO CORRIGIDA** para usar classes, não estilos inline.
 function showScreen(screenName) {
-    for (const key in screens) {
-        screens[key].classList.remove('active');
-    }
+    Object.values(screens).forEach(screen => screen.classList.remove('active'));
     screens[screenName].classList.add('active');
     currentState.screen = screenName;
 }
@@ -87,7 +84,6 @@ function runFragranceMatchEngine() {
         const finalRecommendations = scoredCandidates.filter(p => p.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
         currentState.result = finalRecommendations;
         
-        // **LÓGICA DO ARQUÉTIPO CORRIGIDA**
         let foundArchetypeKey = 'default';
         if (finalRecommendations.length > 0) {
             const topPerfume = finalRecommendations[0];
