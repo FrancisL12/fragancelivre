@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragrance Play - Descubra O Seu Perfume Assinatura</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js" defer></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div id="app">
+<div id="welcome-screen" class="screen active">
+    <div class="container">
+        <div class="logo">
+            <img src="https://i.postimg.cc/50nm5WfF/foto-lord-aroma.png" alt="Logo Lord Aroma" class="logo-image">
+            <h1>Fragrance Play</h1>
+            <p class="subtitle">by Lord Aroma</p>
+        </div>
+
+        <hr class="golden-divider">
+
+        <div class="welcome-content">
+            <h2>Descubra O Seu Perfume Assinatura</h2>
+            <p>Uma experiência única para encontrar o perfume perfeito para sua personalidade</p>
+            <button id="start-btn" class="btn-primary pulse">Vamos lá!</button>
+        </div>
+            </div>
+        </div>
+
+        <div id="identification-screen" class="screen">
+            <div class="container">
+                <div class="progress-bar">
+                    <div class="progress" style="width: 10%;"></div>
+                </div>
+                <h2>Vamos nos conhecer melhor</h2>
+                <form id="user-form">
+                    <div class="form-group">
+                        <label for="user-name">Seu nome:</label>
+                        <input type="text" id="user-name" name="user-name" required placeholder="Digite seu nome">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="user-photo">Sua foto (opcional):</label>
+                        <div class="photo-upload">
+                            <input type="file" id="user-photo" accept="image/*">
+                            <div class="photo-preview">
+                                <div class="photo-placeholder">📷</div>
+                                <img id="preview-img" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Universo de fragrâncias:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="universe" value="masculino" required>
+                                <span>Masculino</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="universe" value="feminino" required>
+                                <span>Feminino</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="universe" value="versatil" required>
+                                <span>Versátil</span>
+                                <small>Serve para ambos</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Você prefere perfumes:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="origin" value="importados" required>
+                                <span>Importados</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="origin" value="nacionais" required>
+                                <span>Nacionais</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="origin" value="ambos" required>
+                                <span>Ambos</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Continuar</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="quiz-screen" class="screen">
+            <div class="container">
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <div class="quiz-content">
+                    <h2 id="question-title"></h2>
+                    <div id="question-options"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading-screen" class="screen">
+            <div class="container">
+                <div class="loading-animation">
+                    <div class="perfume-bottle">🧴</div>
+                    <div class="loading-text">
+                        <h2>Mapeando seu universo de perfumes...</h2>
+                        <div class="dots">
+                            <span>.</span>
+                            <span>.</span>
+                            <span>.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-screen" class="screen">
+            <div class="container">
+                <div id="result-content" class="result-content">
+                    <div class="user-info">
+                        <div class="user-photo-circle" id="result-photo-container">
+                            <input type="file" id="result-user-photo-input" accept="image/*" style="display: none;">
+                            <img id="result-user-photo" alt="Foto do usuário">
+                        </div>
+                        <h1 id="result-user-name" class="user-name"></h1>
+                        <h2 id="archetype-name" class="archetype-name"></h2>
+                        <p id="archetype-description" class="archetype-description"></p>
+                    </div>
+
+                    
+                    <div class="perfume-recommendations">
+                        <h3>Perfumes recomendados para você:</h3>
+                        <div id="recommended-perfumes" class="perfumes-grid"></div>
+                    </div>
+                    
+                    <div class="additional-info">
+                        <div class="info-section">
+                            <h3 class="curiosity-title">CURIOSIDADES SOBRE SEU PERFIL 😉</h3>
+                            
+                            <div class="curiosity-item">
+                                <h4>Ocasiões ideais:</h4>
+                                <p id="ideal-occasions"></p>
+                            </div>
+                            <div class="curiosity-item">
+                                <h4>Famosos com perfil parecido:</h4>
+                                <p id="famous-people"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="action-buttons">
+                    <div class="cta-section">
+                        <p class="cta-text">E para você comprar seus perfumes aproveitando as melhores promoções da internet:</p>
+                        <a href="https://chat.whatsapp.com/LjwtU5fO5d8Aec1F9Gjc2W" target="_blank" class="btn-whatsapp pulse">
+                            📱 Entrar no grupo VIP de promoções
+                        </a>
+                    </div>
+                    <button id="share-btn" class="btn-secondary">📤 Compartilhar Resultado</button>
+                </div>
+
+                <p class="credits-footer">Feito com Amor 💛 por Lord Aroma</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="crop-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Ajuste sua foto</h2>
+            <div class="crop-container">
+                <img id="image-to-crop">
+            </div>
+            <div class="modal-buttons">
+                <button id="cancel-crop-btn" class="btn-secondary">Cancelar</button>
+                <button id="confirm-crop-btn" class="btn-primary">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="click-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+    <audio id="success-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+
+    <script src="script.js"></script>
+    <p class="credits-footer">Copyright &copy; 2024 Lord Aroma. Todos os direitos reservados.</p>
+</body>
+</html>
