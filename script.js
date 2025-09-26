@@ -9,7 +9,7 @@
 const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxmIvPrUPOtn5xALHbFKSHjjtvT0Bm37y5GADmbNqBLVbhctylofHnCaPU1W27NBmI/exec';
 const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbzxZDfrUJK0VxetiUaSQqXTlRKQu_TMjyb5N5-G78_ueCG1VYH4qhEOqwnJ9OJVdDXB/exec';
 // IMPORTANTE: Certifique-se de que esta é a URL da sua *última implantação* do App da Web.
-const GOOGLE_SHEET_URL_LEADS = 'https://script.google.com/macros/s/AKfycbxOidKtrbNnv7wwU-WoKBoAb5SjaQlfTJNsU-Hf7MUKLQ4ZyCifJxwYx1ugnSnGUas/exec'; 
+const GOOGLE_SHEET_URL_LEADS = 'https://script.google.com/macros/s/AKfycbxgkAgSXwElwVPXehCs8-3c4WEw8hz2wQoMVryGSOqqa-eC2wBMs8eXFNTxHByELW0B/exec'; 
 const WHATSAPP_NUMBER = '5511999999999';
 
 // --- ARQUÉTIPOS ---
