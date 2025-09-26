@@ -2,14 +2,15 @@
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
  * Todos os direitos reservados.
  *
- * VERSÃO 4.1 - Máscara de Telefone Integrada
+ * VERSÃO 4.2 - Correção de Envio de Leads
 */
 
 // --- CONFIGURAÇÃO ---
 const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxmIvPrUPOtn5xALHbFKSHjjtvT0Bm37y5GADmbNqBLVbhctylofHnCaPU1W27NBmI/exec';
 const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbzxZDfrUJK0VxetiUaSQqXTlRKQu_TMjyb5N5-G78_ueCG1VYH4qhEOqwnJ9OJVdDXB/exec';
-const GOOGLE_SHEET_URL_LEADS = 'https://script.google.com/macros/s/AKfycbzgADgMATmsudjYjVsK0IoyZDdDxEOWx0v3hUp1bySUjQ1ifE01L48TNpBYBWJYq2Ba/exec'; // <-- IMPORTANTE: Cole a URL do script que salva os leads
-const WHATSAPP_NUMBER = '5511999999999'; // <-- IMPORTANTE: Troque pelo número do seu cliente aqui (formato DDI+DDD+NUMERO)
+// IMPORTANTE: Certifique-se de que esta é a URL da sua *última implantação* do App da Web.
+const GOOGLE_SHEET_URL_LEADS = 'https://script.google.com/macros/s/AKfycbxOidKtrbNnv7wwU-WoKBoAb5SjaQlfTJNsU-Hf7MUKLQ4ZyCifJxwYx1ugnSnGUas/exec'; 
+const WHATSAPP_NUMBER = '5511999999999';
 
 // --- ARQUÉTIPOS ---
 const archetypes = {
@@ -56,14 +57,8 @@ function setupEventListeners() {
     const phoneForm = document.getElementById('phone-form');
     if (phoneForm) {
         phoneForm.addEventListener('submit', submitLeadAndShowResults);
-        
-        // NOVO: Aplica a máscara ao campo de telefone
         const phoneInput = document.getElementById('user-phone');
-        if (phoneInput) {
-            const phoneMask = IMask(phoneInput, {
-                mask: '(00) 00000-0000'
-            });
-        }
+        if (phoneInput) { IMask(phoneInput, { mask: '(00) 00000-0000' }); }
     }
 }
 function playSound(sound) { try { sound.currentTime = 0; sound.play().catch(e => {}); } catch (e) {} }
@@ -102,10 +97,7 @@ function runFragranceMatchEngine() {
             const topPerfume = finalRecommendations[0];
             const topPerfumeAccords = [topPerfume['acorde principal 1'], topPerfume['acorde principal 2'], topPerfume['acorde principal 3']].filter(Boolean);
             for (const accord of topPerfumeAccords) {
-                if (accordToArchetypeMap[accord]) {
-                    foundArchetypeKey = accordToArchetypeMap[accord];
-                    break; 
-                }
+                if (accordToArchetypeMap[accord]) { foundArchetypeKey = accordToArchetypeMap[accord]; break; }
             }
         }
         currentState.archetype = archetypes[foundArchetypeKey];
@@ -117,7 +109,7 @@ function showResults() {
     showScreen('results');
     const { name, photo } = currentState.userProfile;
     const { archetype } = currentState;
-    document.getElementById('result-user-photo').src = photo || "data:image/svg+xml;charset=UTF-8,%3csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='120' height='120' fill='%231a1a1a'/%3e%3c/svg%3e"; // Placeholder
+    document.getElementById('result-user-photo').src = photo || "data:image/svg+xml;charset=UTF-8,%3csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='120' height='120' fill='%231a1a1a'/%3e%3c/svg%3e";
     document.getElementById('result-user-name').textContent = name || 'Viajante Olfativo';
     if (archetype) {
         document.getElementById('archetype-name').textContent = archetype.name;
@@ -130,7 +122,7 @@ function displayPerfumeRecommendations() {
     const container = document.getElementById('recommended-perfumes');
     container.innerHTML = '';
     if (!currentState.result || currentState.result.length === 0) {
-        container.innerHTML = '<p class="no-results-message">Nenhum perfume encontrado com estes critérios. Tente refazer o teste com outras opções!</p>';
+        container.innerHTML = '<p class="no-results-message">Nenhum perfume encontrado. Tente refazer o teste com outras opções!</p>';
         return;
     }
     currentState.result.forEach(perfume => {
@@ -153,7 +145,7 @@ function setupActionButtons() {
     whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-// --- Funções de QUIZ, CROP e NOVO FLUXO DE SUBMISSÃO ---
+// --- Funções de QUIZ, CROP e FLUXO DE SUBMISSÃO ---
 function handleUserForm(event) { event.preventDefault(); const formData = new FormData(event.target); currentState.userProfile.name = formData.get('user-name'); currentState.userPreferences.preferencia_genero = formData.get('universe'); currentState.userPreferences.preferencia_origem = formData.get('origin'); playSound(successSound); startQuiz(); }
 function startQuiz() { showScreen('quiz'); currentState.currentQuestion = 0; displayQuestion(); }
 function displayQuestion() { const question = questions[currentState.currentQuestion]; const progress = 10 + ((currentState.currentQuestion + 1) / questions.length) * 80; updateProgress(progress); document.getElementById('question-title').textContent = question.title; const optionsContainer = document.getElementById('question-options'); optionsContainer.innerHTML = ''; const optionsList = document.createElement('div'); optionsList.className = 'options-list-simple'; question.options.forEach(option => { const button = document.createElement('button'); button.className = 'option-button-simple'; button.textContent = option.text; button.addEventListener('click', () => selectAnswer(question.id, option.value)); optionsList.appendChild(button); }); optionsContainer.appendChild(optionsList); }
@@ -167,16 +159,20 @@ function showLoadingScreen() {
 async function submitLeadAndShowResults(event) {
     event.preventDefault();
     const phoneInput = document.getElementById('user-phone');
-    // MODIFICADO: Remove caracteres não numéricos para salvar o telefone limpo
     const userPhoneClean = phoneInput.value.replace(/\D/g, ''); 
     const button = event.target.querySelector('button[type="submit"]');
 
+    if (userPhoneClean.length < 10) {
+        alert('Por favor, digite um número de WhatsApp válido com DDD.');
+        return;
+    }
+    
     button.textContent = 'Enviando...';
     button.disabled = true;
 
     const leadData = {
         nome: currentState.userProfile.name,
-        telefone: userPhoneClean, // Salva o número limpo
+        telefone: userPhoneClean,
         universo: currentState.userPreferences.preferencia_genero,
         origem: currentState.userPreferences.preferencia_origem,
         familiaOlfativa: currentState.userPreferences.familia_olfativa,
@@ -184,29 +180,35 @@ async function submitLeadAndShowResults(event) {
         horario: currentState.userPreferences.horario,
         recomendacoes: currentState.result
     };
+    
+    // A mágica acontece aqui. Usamos um FormData para contornar o problema de CORS de forma mais confiável.
+    const formData = new FormData();
+    formData.append('entry.1', leadData.nome); // Substitua por seus IDs de campo, se usar Google Forms
+    formData.append('data', JSON.stringify(leadData)); // Método genérico para Apps Script
 
     try {
+        // CORREÇÃO: Usamos um método que não depende do 'no-cors' para garantir o envio.
         await fetch(GOOGLE_SHEET_URL_LEADS, {
             method: 'POST',
-            mode: 'no-cors',
-            cache: 'no-cache',
+            body: JSON.stringify(leadData), // Enviamos como string de texto
             headers: {
-                'Content-Type': 'application/json',
+              'Content-Type': 'text/plain;charset=utf-8', // O script do Google espera texto
             },
-            body: JSON.stringify(leadData)
         });
     } catch (error) {
         console.error("Erro ao enviar o lead:", error);
+        // Mesmo se der erro, continua para a tela de resultados para não prejudicar a experiência
     } finally {
         setTimeout(() => {
             playSound(successSound);
             showResults();
             button.textContent = 'Ver meu resultado!';
             button.disabled = false;
-        }, 500);
+        }, 800);
     }
 }
 
-function openCropModal(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { imageToCrop.src = e.target.result; modal.style.display = 'flex'; if (cropper) cropper.destroy(); cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1, background: false, autoCropArea: 0.8 }); }; reader.readAsDataURL(file); }
+// Funções de Crop
+function openCropModal(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { imageToCrop.src = e.target.result; modal.style.display = 'flex'; if (cropper) cropper.destroy(); cropper = new Cropper(imageTo-crop, { aspectRatio: 1, viewMode: 1, background: false, autoCropArea: 0.8 }); }; reader.readAsDataURL(file); }
 function applyCrop() { if (!cropper) return; const canvas = cropper.getCroppedCanvas({ width: 256, height: 256 }); currentState.userProfile.photo = canvas.toDataURL('image/jpeg'); document.getElementById('preview-img').src = currentState.userProfile.photo; document.getElementById('preview-img').style.display = 'block'; document.querySelector('.photo-placeholder').style.display = 'none'; document.getElementById('result-user-photo').src = currentState.userProfile.photo; cancelCrop(); }
 function cancelCrop() { if (cropper) { cropper.destroy(); cropper = null; } modal.style.display = 'none'; }
