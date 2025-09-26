@@ -2,13 +2,13 @@
  * Copyright (c) 2024 Lord Aroma - Francisco Leite.
  * Todos os direitos reservados.
  *
- * VERSÃO 4.0 - Captura de Leads Integrada
+ * VERSÃO 4.1 - Máscara de Telefone Integrada
 */
 
 // --- CONFIGURAÇÃO ---
-const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxmIvPrUPOtn5xALHbFKSHjjtvT0Bm37y5GADmbNqBLVbhctylofHnCaPU1W27NBmI/exec'; // <-- IMPORTANTE: Cole a URL do script que recomenda os perfumes -> cadastro
-const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbzxZDfrUJK0VxetiUaSQqXTlRKQu_TMjyb5N5-G78_ueCG1VYH4qhEOqwnJ9OJVdDXB/exec'; // <-- IMPORTANTE: Cole a URL do script que mapeia os perfumes
-const GOOGLE_SHEET_URL_LEADS = 'https://script.google.com/macros/s/AKfycby2aeEZRjojVfDOmlfED-3YOYZmLvEazmQwaauEJjhmNOKbYwRX3zVe__KfhiTu_Jlc/exec'; // <-- IMPORTANTE: Cole a URL do script que salva os leads
+const GOOGLE_SHEET_URL_PERFUMES = 'https://script.google.com/macros/s/AKfycbxmIvPrUPOtn5xALHbFKSHjjtvT0Bm37y5GADmbNqBLVbhctylofHnCaPU1W27NBmI/exec';
+const GOOGLE_SHEET_URL_MAPPING = 'https://script.google.com/macros/s/AKfycbzxZDfrUJK0VxetiUaSQqXTlRKQu_TMjyb5N5-G78_ueCG1VYH4qhEOqwnJ9OJVdDXB/exec';
+const GOOGLE_SHEET_URL_LEADS = 'COLE_A_URL_DO_SEU_NOVO_APP_DA_WEB_AQUI'; // <-- IMPORTANTE: Cole a URL do script que salva os leads
 const WHATSAPP_NUMBER = '5511999999999'; // <-- IMPORTANTE: Troque pelo número do seu cliente aqui (formato DDI+DDD+NUMERO)
 
 // --- ARQUÉTIPOS ---
@@ -25,7 +25,7 @@ const archetypes = {
 const accordToArchetypeMap = { 'Amadeirado': 'amadeirado', 'Cítrico': 'cítrico', 'Floral': 'floral', 'Frutado': 'frutado', 'Especiado': 'especiado', 'Aromático': 'aromático', 'Oriental': 'oriental', 'Fougère': 'aromático', 'Chipre': 'amadeirado', 'Gourmand': 'oriental' };
 
 // --- VARIÁVEIS DE ESTADO E ELEMENTOS DO DOM ---
-const questions = [ { id: 'familia_olfativa', title: "Qual destes universos de cheiros mais te atrai?", options: [ { text: "Cítricos & Frescos", value: ["GRUPO: CÍTRICAS", "GRUPO: FRUTAS"] }, { text: "Doces & Gourmands", value: ["GRUPO: DOCES & AROMAS GOURMETS", "GRUPO: BEBIDAS"] }, { text: "Florais & Delicados", value: ["GRUPO: FLORES BRANCAS", "GRUPO: FLORES NATURAIS E RECONSTRUÍDAS"] }, { text: "Amadeirados & Marcantes", value: ["GRUPO: MADEIRAS & MUSGOS", "GRUPO: RESINAS & BÁLSAMOS"] }, { text: "Exóticos & Especiados", value: ["GRUPO: ESPECIARIAS", "GRUPO: MUSK, ÂMBARES, NOTAS ANIMÁLICAS"] }, { text: "Verdes & Naturais", value: ["GRUPO: PLANTAS, ERVAS E FOUGÈRES", "GRUPO: VEGETAIS"] } ] }, { id: 'estacao', title: "Você busca um perfume para qual estação?", options: [ { text: "Calor Intenso (Verão)", value: "verao" }, { text: "Frio Aconchegante (Inverno)", value: "inverno" }, { text: "Clima Amenos (Outono/Primavera)", value: "outono,primavera" }, { text: "Todas as Estações", value: "todas" } ] }, { id: 'horario', title: "E para qual momento do dia?", options: [ { text: "Para o Dia", value: "dia" }, { text: "Para a Noite", value: "noite" }, { text: "Versátil (Dia e Noite)", value: "ambos" } ] } ];
+const questions = [ { id: 'familia_olfativa', title: "Qual destes universos de cheiros mais te atrai?", options: [ { text: "Cítricos & Frescos", value: ["GRUPO: CÍTRICAS", "GRUPO: FRUTAS"] }, { text: "Doces & Gourmands", value: ["GRUPO: DOCES & AROMAS GOURMETS", "GRUPO: BEBIDAS"] }, { text: "Florais & Delicados", value: ["GRUPO: FLORES BRANCAS", "GRUPO: FLORES NATURAIS E RECONSTRUÍDAS"] }, { text: "Amadeirados & Marcantes", value: ["GRUPO: MADEIRAS & MUSGOS", "GRUPO: RESINAS & BÁLSAMOS"] }, { text: "Exóticos & Especiados", value: ["GRUPO: ESPECIARIAS", "GRUPO: MUSK, ÂMBARES, NOTAS ANIMÁLICA"] }, { text: "Verdes & Naturais", value: ["GRUPO: PLANTAS, ERVAS E FOUGÈRES", "GRUPO: VEGETAIS"] } ] }, { id: 'estacao', title: "Você busca um perfume para qual estação?", options: [ { text: "Calor Intenso (Verão)", value: "verao" }, { text: "Frio Aconchegante (Inverno)", value: "inverno" }, { text: "Clima Amenos (Outono/Primavera)", value: "outono,primavera" }, { text: "Todas as Estações", value: "todas" } ] }, { id: 'horario', title: "E para qual momento do dia?", options: [ { text: "Para o Dia", value: "dia" }, { text: "Para a Noite", value: "noite" }, { text: "Versátil (Dia e Noite)", value: "ambos" } ] } ];
 let currentState = { screen: 'welcome', currentQuestion: 0, userPreferences: {}, userProfile: { name: '', photo: null, universe: '', origin: '' }, result: [], archetype: null };
 let perfumeDatabase = [], olfactoryMapping = {}, cropper = null;
 const screens = { welcome: document.getElementById('welcome-screen'), identification: document.getElementById('identification-screen'), quiz: document.getElementById('quiz-screen'), loading: document.getElementById('loading-screen'), results: document.getElementById('results-screen') };
@@ -52,9 +52,18 @@ function setupEventListeners() {
     document.getElementById('confirm-crop-btn').addEventListener('click', applyCrop);
     document.getElementById('cancel-crop-btn').addEventListener('click', cancelCrop);
     document.getElementById('redo-btn').addEventListener('click', () => { playSound(clickSound); showScreen('identification'); updateProgress(10); });
-    // NOVO: Adiciona o listener para o formulário de telefone
-    if(document.getElementById('phone-form')) {
-        document.getElementById('phone-form').addEventListener('submit', submitLeadAndShowResults);
+    
+    const phoneForm = document.getElementById('phone-form');
+    if (phoneForm) {
+        phoneForm.addEventListener('submit', submitLeadAndShowResults);
+        
+        // NOVO: Aplica a máscara ao campo de telefone
+        const phoneInput = document.getElementById('user-phone');
+        if (phoneInput) {
+            const phoneMask = IMask(phoneInput, {
+                mask: '(00) 00000-0000'
+            });
+        }
     }
 }
 function playSound(sound) { try { sound.currentTime = 0; sound.play().catch(e => {}); } catch (e) {} }
@@ -100,7 +109,6 @@ function runFragranceMatchEngine() {
             }
         }
         currentState.archetype = archetypes[foundArchetypeKey];
-        // MODIFICADO: Não chama mais o showResults() aqui.
     } catch (error) { console.error("ERRO NO MOTOR:", error); alert("Ocorreu um erro ao processar suas preferências."); showScreen('welcome'); }
 }
 
@@ -109,7 +117,7 @@ function showResults() {
     showScreen('results');
     const { name, photo } = currentState.userProfile;
     const { archetype } = currentState;
-    document.getElementById('result-user-photo').src = photo || "data:image/svg+xml,..."; // Placeholder
+    document.getElementById('result-user-photo').src = photo || "data:image/svg+xml;charset=UTF-8,%3csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='120' height='120' fill='%231a1a1a'/%3e%3c/svg%3e"; // Placeholder
     document.getElementById('result-user-name').textContent = name || 'Viajante Olfativo';
     if (archetype) {
         document.getElementById('archetype-name').textContent = archetype.name;
@@ -151,18 +159,16 @@ function startQuiz() { showScreen('quiz'); currentState.currentQuestion = 0; dis
 function displayQuestion() { const question = questions[currentState.currentQuestion]; const progress = 10 + ((currentState.currentQuestion + 1) / questions.length) * 80; updateProgress(progress); document.getElementById('question-title').textContent = question.title; const optionsContainer = document.getElementById('question-options'); optionsContainer.innerHTML = ''; const optionsList = document.createElement('div'); optionsList.className = 'options-list-simple'; question.options.forEach(option => { const button = document.createElement('button'); button.className = 'option-button-simple'; button.textContent = option.text; button.addEventListener('click', () => selectAnswer(question.id, option.value)); optionsList.appendChild(button); }); optionsContainer.appendChild(optionsList); }
 function selectAnswer(questionId, value) { playSound(clickSound); currentState.userPreferences[questionId] = value; setTimeout(() => { if (currentState.currentQuestion < questions.length - 1) { currentState.currentQuestion++; displayQuestion(); } else { showLoadingScreen(); } }, 400); }
 
-// MODIFICADO: Agora essa função apenas mostra a tela de loading e roda o motor
 function showLoadingScreen() {
     showScreen('loading');
-    // Roda o motor para calcular os resultados em segundo plano
     runFragranceMatchEngine();
 }
 
-// NOVO: Função para enviar os dados para a planilha e depois mostrar os resultados
 async function submitLeadAndShowResults(event) {
     event.preventDefault();
     const phoneInput = document.getElementById('user-phone');
-    const userPhone = phoneInput.value;
+    // MODIFICADO: Remove caracteres não numéricos para salvar o telefone limpo
+    const userPhoneClean = phoneInput.value.replace(/\D/g, ''); 
     const button = event.target.querySelector('button[type="submit"]');
 
     button.textContent = 'Enviando...';
@@ -170,7 +176,7 @@ async function submitLeadAndShowResults(event) {
 
     const leadData = {
         nome: currentState.userProfile.name,
-        telefone: userPhone,
+        telefone: userPhoneClean, // Salva o número limpo
         universo: currentState.userPreferences.preferencia_genero,
         origem: currentState.userPreferences.preferencia_origem,
         familiaOlfativa: currentState.userPreferences.familia_olfativa,
@@ -192,7 +198,6 @@ async function submitLeadAndShowResults(event) {
     } catch (error) {
         console.error("Erro ao enviar o lead:", error);
     } finally {
-        // Atraso para dar um feedback visual antes de mudar de tela
         setTimeout(() => {
             playSound(successSound);
             showResults();
@@ -202,7 +207,6 @@ async function submitLeadAndShowResults(event) {
     }
 }
 
-// Funções de CROP (sem alteração)
 function openCropModal(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { imageToCrop.src = e.target.result; modal.style.display = 'flex'; if (cropper) cropper.destroy(); cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1, background: false, autoCropArea: 0.8 }); }; reader.readAsDataURL(file); }
 function applyCrop() { if (!cropper) return; const canvas = cropper.getCroppedCanvas({ width: 256, height: 256 }); currentState.userProfile.photo = canvas.toDataURL('image/jpeg'); document.getElementById('preview-img').src = currentState.userProfile.photo; document.getElementById('preview-img').style.display = 'block'; document.querySelector('.photo-placeholder').style.display = 'none'; document.getElementById('result-user-photo').src = currentState.userProfile.photo; cancelCrop(); }
 function cancelCrop() { if (cropper) { cropper.destroy(); cropper = null; } modal.style.display = 'none'; }
